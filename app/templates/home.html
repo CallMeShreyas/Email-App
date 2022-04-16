@@ -30,7 +30,7 @@
             <a class="nav-link active" aria-current="page" href="/email/sent">Sent Messages </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Log Out</a>
+            <a class="nav-link" href="/email/logged_out">Log Out</a>
           </li>
           <li class="nav-item dropdown">
 
@@ -48,24 +48,21 @@
       <table class="table table-dark table-striped">
         <tr>
           <!-- <th>PrimaryKey</th> -->
-          <th> No. </th>
-          <th> Sender </th>
+          <!-- <th> No. </th> -->
+          <th> From </th>
           <th> Subject </th>
           <th> Date </th>
-          <th> Delete </th>
         </tr>
 
         {% for i in emails %}
 
         <tr>
           <!-- <td>{{i.id}}</td> -->
-          <td>{{i.id}}</td>
+          <!-- <td>{{i.id}}</td> -->
           <td>{{i.sender}}</td>
           <td>{{i.subject}}</td>
           <td>{{i.date}}</td>
-          <td>
-            <a href='work_delete/{{ i.id }}'> Remove </a>
-          </td>
+          
         </tr>
 
         {% endfor %}

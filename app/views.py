@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import *
 from .models import *
 import requests
@@ -38,10 +38,11 @@ def home(request):
                 if i['receiver'] == uname:
                     mails.append(i)
             return render(request, "home.html", {'uname': uname, 'emails': mails, 'user': user})
-
+        else:
+            return HttpResponse("<h1> Logged Out </h1>")
         # return render(request, 'sentmail.html')
         
-def success(request):
+def compose_success(request):
 
         receiver=request.POST.get('rec')
         subject=request.POST.get('subject')
@@ -63,10 +64,34 @@ def success(request):
                return HttpResponse("<h1> Invalid Credentials </h1>")
 
 def sentmails(request):
-    # if username is not null:
-    #     user=User.objects.get(user_name=username[0])
-    pass
+    user = User.objects.get(user_name=username[0])
+    if user.password == pwd[0]:
+        responce = requests.get('https://shreyas001.pythonanywhere.com/api/emaildb/')
+        resp = responce.json()
+        mails = []
+        for i in resp:
+            if i['sender'] == username[0]:
+                mails.append(i)
+        return render(request, "sentmail.html", {'uname': username[0], 'emails': mails, 'user': username[0]})
 
+def success(request):
+    user = User.objects.get(user_name=username[0])
+    if user.password == pwd[0]:
+        responce = requests.get('https://shreyas001.pythonanywhere.com/api/emaildb/')
+        resp = responce.json()
+        mails = []
+        for i in resp:
+            if i['receiver'] == username[0]:
+                mails.append(i)
+        return render(request, "home.html", {'uname': username[0], 'emails': mails, 'user': user})
 
 def compose(request):
-    return render(request, 'compose.html')
+    user = User.objects.get(user_name=username[0])
+    if user.password == pwd[0]:
+        return render(request, 'compose.html')
+
+def logout(request):
+    username.remove(username[0])
+    pwd.remove(pwd[0])
+    u_name.remove(u_name[0])
+    return render(request, 'index.html')

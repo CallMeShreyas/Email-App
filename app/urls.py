@@ -7,5 +7,7 @@ urlpatterns = [
     path('home', views.home),
     path('sent', views.sentmails),
     path('compose', views.compose),
-    path('success', views.success)
+    path('email_sent', views.compose_success),
+    path('success', views.success),
+    path('logged_out', views.logout)
 ]
