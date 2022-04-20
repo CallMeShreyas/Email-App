@@ -95,3 +95,12 @@ def logout(request):
     pwd.remove(pwd[0])
     u_name.remove(u_name[0])
     return render(request, 'index.html')
+
+def viewmsg(request, id):
+    user = User.objects.get(user_name=username[0])
+    if user.password == pwd[0]:
+        responce = requests.get('https://shreyas001.pythonanywhere.com/api/emaildb/')
+        resp = responce.json()
+        for i in resp:
+            if i['id'] == id:
+                return render(request, 'viewmsg.html', { 'email': i })

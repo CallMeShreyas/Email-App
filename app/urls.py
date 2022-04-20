@@ -9,5 +9,6 @@ urlpatterns = [
     path('compose', views.compose),
     path('email_sent', views.compose_success),
     path('success', views.success),
-    path('logged_out', views.logout)
+    path('logged_out', views.logout),
+    path('view/<int:id>', views.viewmsg)
 ]

@@ -52,6 +52,7 @@
           <th> From </th>
           <th> Subject </th>
           <th> Date </th>
+          <th> Open Email </th>
         </tr>
 
         {% for i in emails %}
@@ -62,6 +63,9 @@
           <td>{{i.sender}}</td>
           <td>{{i.subject}}</td>
           <td>{{i.date}}</td>
+          <td>
+            <a href='view/{{ i.id }}'> View </a>
+        </td>
           
         </tr>
 
