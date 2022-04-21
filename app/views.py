@@ -46,7 +46,7 @@ def compose_success(request):
     message = request.POST.get('message')
     today = date.today()
     responce = requests.post('https://shreyas001.pythonanywhere.com/api/emaildb/', data={
-                             'sender': username[0], 'receiver': receiver, 'subject': subject, 'message': message, 'date': today})
+                             'sender': current_user.username, 'receiver': receiver, 'subject': subject, 'message': message, 'date': today})
 
     if responce.status_code == 201:
         responce = requests.get(
