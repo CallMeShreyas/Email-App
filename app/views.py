@@ -1,16 +1,17 @@
 from django.shortcuts import render, redirect
 from django.http import *
-from .models import *
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 import requests
 import json
 from datetime import date
-# Create your views here.
-username = []
-pwd = []
-u_name = []
 
 
-def login(request):
+# username = []
+# pwd = []
+# u_name = []
+
+def loggin(request):
     # return HttpResponse("<h1>Working</h1>")
     return render(request, "login.html")
 
@@ -22,85 +23,82 @@ def signup(request):
 
 def home(request):
     if request.method == "POST":
-        uname = request.POST.get('uname')
+        username = request.POST.get('uname')
         password = request.POST.get('p1')
-        user = User.objects.get(user_name=uname)
-        if user.password == password:
-            # username = uname
-            # pwd = password
-            username.append(uname)
-            pwd.append(password)
-            u_name.append(user.name)
-            responce = requests.get('https://shreyas001.pythonanywhere.com/api/emaildb/')
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            responce = requests.get(
+                'https://shreyas001.pythonanywhere.com/api/emaildb/')
             resp = responce.json()
             mails = []
             for i in resp:
-                if i['receiver'] == uname:
+                if i['receiver'] == username:
                     mails.append(i)
-            return render(request, "home.html", {'uname': uname, 'emails': mails, 'user': user})
-        else:
-            return HttpResponse("<h1> Logged Out </h1>")
-        # return render(request, 'sentmail.html')
-        
+            return render(request, "home.html", {'uname': username, 'emails': mails, 'user': user})
+
+
 def compose_success(request):
+    current_user = request.user
+    receiver = request.POST.get('rec')
+    subject = request.POST.get('subject')
+    message = request.POST.get('message')
+    today = date.today()
+    responce = requests.post('https://shreyas001.pythonanywhere.com/api/emaildb/', data={
+                             'sender': username[0], 'receiver': receiver, 'subject': subject, 'message': message, 'date': today})
 
-        receiver=request.POST.get('rec')
-        subject=request.POST.get('subject')
-        message=request.POST.get('message')
-        today=date.today()
-        responce=requests.post('https://shreyas001.pythonanywhere.com/api/emaildb/', data={'sender': username[0], 'receiver': receiver , 'subject': subject , 'message': message , 'date':today})
+    if responce.status_code == 201:
+        responce = requests.get(
+            'https://shreyas001.pythonanywhere.com/api/emaildb/')
+        resp = responce.json()
+        mails = []
+        for i in resp:
+            if i['receiver'] == current_user.username:
+                mails.append(i)
+        return render(request, "home.html", {'uname': current_user.username, 'emails': mails, 'user': current_user})
 
-        if responce.status_code == 201:
-            user = User.objects.get(user_name=username[0])
-            if user.password == pwd[0]:
-                responce = requests.get('https://shreyas001.pythonanywhere.com/api/emaildb/')
-                resp = responce.json()
-                mails = []
-                for i in resp:
-                    if i['receiver'] == username[0]:
-                        mails.append(i)
-                return render(request, "home.html", {'uname': username[0], 'emails': mails, 'user': username[0]})
-            else:
-               return HttpResponse("<h1> Invalid Credentials </h1>")
 
 def sentmails(request):
-    user = User.objects.get(user_name=username[0])
-    if user.password == pwd[0]:
-        responce = requests.get('https://shreyas001.pythonanywhere.com/api/emaildb/')
-        resp = responce.json()
-        mails = []
-        for i in resp:
-            if i['sender'] == username[0]:
-                mails.append(i)
-        return render(request, "sentmail.html", {'uname': username[0], 'emails': mails, 'user': username[0]})
+    # user = User.objects.get(user_name=username[0])
+    current_user = request.user
+    responce = requests.get(
+        'https://shreyas001.pythonanywhere.com/api/emaildb/')
+    resp = responce.json()
+    mails = []
+    for i in resp:
+        if i['sender'] == current_user.username:
+            mails.append(i)
+    return render(request, "sentmail.html", {'uname': current_user.username, 'emails': mails})
+
 
 def success(request):
-    user = User.objects.get(user_name=username[0])
-    if user.password == pwd[0]:
-        responce = requests.get('https://shreyas001.pythonanywhere.com/api/emaildb/')
-        resp = responce.json()
-        mails = []
-        for i in resp:
-            if i['receiver'] == username[0]:
-                mails.append(i)
-        return render(request, "home.html", {'uname': username[0], 'emails': mails, 'user': user})
+    current_user = request.user
+    responce = requests.get(
+        'https://shreyas001.pythonanywhere.com/api/emaildb/')
+    resp = responce.json()
+    mails = []
+    for i in resp:
+        if i['receiver'] == current_user.username:
+            mails.append(i)
+    return render(request, "home.html", {'uname': current_user.username, 'emails': mails, 'user': current_user})
+
 
 def compose(request):
-    user = User.objects.get(user_name=username[0])
-    if user.password == pwd[0]:
-        return render(request, 'compose.html')
+    return render(request, 'compose.html')
 
-def logout(request):
-    username.remove(username[0])
-    pwd.remove(pwd[0])
-    u_name.remove(u_name[0])
+
+def loggout(request):
+    logout(request)
     return render(request, 'index.html')
 
+
 def viewmsg(request, id):
-    user = User.objects.get(user_name=username[0])
-    if user.password == pwd[0]:
-        responce = requests.get('https://shreyas001.pythonanywhere.com/api/emaildb/')
-        resp = responce.json()
-        for i in resp:
+    current_user=request.user
+   
+    responce = requests.get(
+            'https://shreyas001.pythonanywhere.com/api/emaildb/')
+    resp = responce.json()
+    for i in resp:
             if i['id'] == id:
-                return render(request, 'viewmsg.html', { 'email': i })
+                return render(request, 'viewmsg.html', {'email': i})
