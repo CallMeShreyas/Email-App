@@ -30,7 +30,7 @@ def home(request):
         if user is not None:
             login(request, user)
             responce = requests.get(
-                'https://shreyas001.pythonanywhere.com/api/emaildb/')
+                'https://shreyas001.herokuapp.com/api/emaildb/')
             resp = responce.json()
             mails = []
             for i in resp:
@@ -45,12 +45,12 @@ def compose_success(request):
     subject = request.POST.get('subject')
     message = request.POST.get('message')
     today = date.today()
-    responce = requests.post('https://shreyas001.pythonanywhere.com/api/emaildb/', data={
+    responce = requests.post('https://shreyas001.herokuapp.com/api/emaildb/', data={
                              'sender': current_user.username, 'receiver': receiver, 'subject': subject, 'message': message, 'date': today})
 
     if responce.status_code == 201:
         responce = requests.get(
-            'https://shreyas001.pythonanywhere.com/api/emaildb/')
+            'https://shreyas001.herokuapp.com/api/emaildb/')
         resp = responce.json()
         mails = []
         for i in resp:
@@ -63,7 +63,7 @@ def sentmails(request):
     # user = User.objects.get(user_name=username[0])
     current_user = request.user
     responce = requests.get(
-        'https://shreyas001.pythonanywhere.com/api/emaildb/')
+        'https://shreyas001.herokuapp.com/api/emaildb/')
     resp = responce.json()
     mails = []
     for i in resp:
@@ -75,7 +75,7 @@ def sentmails(request):
 def success(request):
     current_user = request.user
     responce = requests.get(
-        'https://shreyas001.pythonanywhere.com/api/emaildb/')
+        'https://shreyas001.herokuapp.com/api/emaildb/')
     resp = responce.json()
     mails = []
     for i in resp:
@@ -97,7 +97,7 @@ def viewmsg(request, id):
     current_user=request.user
    
     responce = requests.get(
-            'https://shreyas001.pythonanywhere.com/api/emaildb/')
+            'https://shreyas001.herokuapp.com/api/emaildb/')
     resp = responce.json()
     for i in resp:
             if i['id'] == id:
